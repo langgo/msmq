@@ -21,9 +21,9 @@ import (
 func GetMQ() (msmq.MessageQueue, error) {
 	mopts := Options{
 		Debug:     false,
-		User:      "cloud",
-		Password:  "212147a1c567bb9e",
-		Address:   "mysql.yun3.com:3306",
+		User:      "",
+		Password:  "",
+		Address:   "",
 		DBName:    "msmq",
 		TableName: "mq",
 	}
@@ -38,21 +38,10 @@ func GetMQ() (msmq.MessageQueue, error) {
 }
 
 func Test1(t *testing.T) {
-	mopts := Options{
-		Debug:     false,
-		User:      "cloud",
-		Password:  "212147a1c567bb9e",
-		Address:   "mysql.yun3.com:3306",
-		DBName:    "msmq",
-		TableName: "mq",
-	}
-	store, err := NewMysqlStore(&mopts, &DefaultPayload{})
+	mq, err := GetMQ()
 	if err != nil {
 		t.Error(err)
 	}
-
-	opts := msmq.Options{}
-	mq := msmq.NewMessageQueue(&opts, log.New(os.Stderr, "", log.LstdFlags), store)
 
 	go func() {
 		ch := mq.Consume(context.Background(), "test")

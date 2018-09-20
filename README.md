@@ -2,16 +2,53 @@
 
 以MySQL做为持久化存储的消息队列。满足简单，性能不苛刻的场景。
 
+## 使用
+
+```go
+mopts := Options{
+    Debug:     false,
+    User:      "",
+    Password:  "",
+    Address:   "",
+    DBName:    "msmq",
+    TableName: "mq",
+}
+store, err := NewMysqlStore(&mopts, &DefaultPayload{})
+if err != nil {
+    return nil, err
+}
+
+opts := msmq.Options{}
+mq := msmq.NewMessageQueue(&opts, log.New(os.Stderr, "", log.LstdFlags), store)
+
+go func() {
+    ch := mq.Consume(context.Background(), "test")
+
+    for msg := range ch {
+        if err := msg.Start(); err != nil {
+            t.Error(err)
+        }
+
+        p, err := msg.Payload()
+        if err != nil {
+            t.Error(err)
+        }
+
+        // 实际消费消息
+        fmt.Printf("%s: %s\n", msg.Topic(), string(p.([]byte)))
+
+        if err := msg.Done(); err != nil {
+            t.Error(err)
+        }
+    }
+}()
+
+if err := mq.Produce("test", []byte("test data")); err != nil {
+    t.Error(err)
+}
+```
+
 ## next
 
-- 去除对gopool的依赖
 - 有客户端保留消费偏移量，方便重放。
-- 对存储接口话，不完全依赖MySQL
 - 支持Pub/Sub
-
-
-## TODO
-
-- 并发 看看需要并发的地方
-// TODO 额外支持，用回调的防止
-// TODO 惰性检查间隔
