@@ -126,6 +126,10 @@ func (ms *mysqlStore) Insert(topic string, payload interface{}) error {
 	return ms.db.Create(&dao).Error
 }
 
+func (ms *mysqlStore) Close() error {
+	return ms.db.Close()
+}
+
 type message struct {
 	ing   bool
 	store *mysqlStore
