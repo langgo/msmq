@@ -27,15 +27,6 @@ type Rows interface {
 	Scan() (Message, error)
 }
 
-// MessageQueue allow
-type MessageQueue interface {
-	// allow Concurrency
-	Consume(ctx context.Context, topic string) <-chan Message
-
-	// allow Concurrency
-	Produce(topic string, payload interface{}) error
-}
-
 type Options struct {
 	QueueCacheLength   int           // 默认 64
 	StoreCheckInternal time.Duration // 默认 500ms
@@ -45,27 +36,28 @@ type Logger interface {
 	Printf(format string, args ...interface{})
 }
 
-type messageQueue struct {
+type MessageQueue struct {
 	opts   *Options
 	logger Logger
 	store  Store
 }
 
-func NewMessageQueue(opts *Options, logger Logger, store Store) MessageQueue {
+func NewMessageQueue(opts *Options, logger Logger, store Store) *MessageQueue {
 	if opts.QueueCacheLength == 0 {
 		opts.QueueCacheLength = 64
 	}
 	if opts.StoreCheckInternal == 0 {
 		opts.StoreCheckInternal = 500 * time.Millisecond
 	}
-	return &messageQueue{
+	return &MessageQueue{
 		opts:   opts,
 		logger: logger,
 		store:  store,
 	}
 }
 
-func (mq *messageQueue) Consume(ctx context.Context, topic string) <-chan Message {
+// allow Concurrency
+func (mq *MessageQueue) Consume(ctx context.Context, topic string) <-chan Message {
 	ch := make(chan Message, mq.opts.QueueCacheLength)
 
 	go func() {
@@ -124,10 +116,11 @@ func (mq *messageQueue) Consume(ctx context.Context, topic string) <-chan Messag
 	return ch
 }
 
-func (mq *messageQueue) Produce(topic string, payload interface{}) error {
+// allow Concurrency
+func (mq *MessageQueue) Produce(topic string, payload interface{}) error {
 	return mq.store.Insert(topic, payload)
 }
 
-func (mq *messageQueue) logf(format string, args ...interface{}) {
+func (mq *MessageQueue) logf(format string, args ...interface{}) {
 	mq.logger.Printf(format, args...)
 }

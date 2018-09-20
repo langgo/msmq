@@ -18,7 +18,7 @@ import (
 	"github.com/langgo/msmq"
 )
 
-func GetMQ() (msmq.MessageQueue, error) {
+func GetMQ() (*msmq.MessageQueue, error) {
 	mopts := Options{
 		Debug:     false,
 		User:      "",
