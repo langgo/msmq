@@ -62,7 +62,7 @@ type Options struct {
 	ReadRepeatTimeout time.Duration
 }
 
-func NewMysqlStore(opts *Options, payloader Payloader) (msmq.Store, error) {
+func NewMysqlStore(opts *Options, payloader Payloader) (*mysqlStore, error) {
 	if opts.Timeout == "" {
 		opts.Timeout = "60s"
 	}
