@@ -27,7 +27,7 @@ func GetMQ() (msmq.MessageQueue, error) {
 		DBName:    "msmq",
 		TableName: "mq",
 	}
-	store, err := NewMysqlStore(&mopts, &DefaultPayload{})
+	store, err := NewMysqlStore(&mopts, DefaultPayload)
 	if err != nil {
 		return nil, err
 	}

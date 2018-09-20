@@ -13,7 +13,7 @@ mopts := Options{
     DBName:    "msmq",
     TableName: "mq",
 }
-store, err := NewMysqlStore(&mopts, &DefaultPayload{})
+store, err := NewMysqlStore(&mopts, DefaultPayload)
 if err != nil {
     return nil, err
 }

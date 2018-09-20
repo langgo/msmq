@@ -22,13 +22,15 @@ type Payloader interface {
 	Decode(payload []byte) (interface{}, error)
 }
 
-type DefaultPayload struct{}
+var DefaultPayload = &defaultPayload{}
 
-func (dp *DefaultPayload) Decode(payload []byte) (interface{}, error) {
+type defaultPayload struct{}
+
+func (dp *defaultPayload) Decode(payload []byte) (interface{}, error) {
 	return payload, nil
 }
 
-func (dp *DefaultPayload) Encode(payload interface{}) ([]byte, error) {
+func (dp *defaultPayload) Encode(payload interface{}) ([]byte, error) {
 	p, ok := payload.([]byte)
 	if !ok {
 		return nil, ErrAssertFail
