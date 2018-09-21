@@ -18,19 +18,19 @@ var (
 )
 
 type Payloader interface {
-	Encode(payload interface{}) ([]byte, error)
-	Decode(payload []byte) (interface{}, error)
+	Encode(topic string, payload interface{}) ([]byte, error)
+	Decode(topic string, payload []byte) (interface{}, error)
 }
 
 var DefaultPayload = &defaultPayload{}
 
 type defaultPayload struct{}
 
-func (dp *defaultPayload) Decode(payload []byte) (interface{}, error) {
+func (dp *defaultPayload) Decode(topic string, payload []byte) (interface{}, error) {
 	return payload, nil
 }
 
-func (dp *defaultPayload) Encode(payload interface{}) ([]byte, error) {
+func (dp *defaultPayload) Encode(topic string, payload interface{}) ([]byte, error) {
 	p, ok := payload.([]byte)
 	if !ok {
 		return nil, ErrAssertFail
@@ -112,7 +112,7 @@ func (ms *mysqlStore) ScanRows(id int, topic string) (msmq.Rows, error) {
 }
 
 func (ms *mysqlStore) Insert(topic string, payload interface{}) error {
-	p, err := ms.payloader.Encode(payload)
+	p, err := ms.payloader.Encode(topic, payload)
 	if err != nil {
 		return err
 	}
@@ -161,7 +161,7 @@ func (m *message) Payload() (interface{}, error) {
 	if !m.ing {
 		return nil, ErrMessageNotStart
 	}
-	return m.store.payloader.Decode(m.dao.Payload)
+	return m.store.payloader.Decode(m.Topic(), m.dao.Payload)
 }
 
 type rows struct {
