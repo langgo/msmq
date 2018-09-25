@@ -131,7 +131,6 @@ func (ms *mysqlStore) Close() error {
 }
 
 type message struct {
-	ing   bool
 	store *mysqlStore
 	dao   *mqDao
 }
@@ -144,12 +143,10 @@ func (m *message) Start() error {
 	if err := m.dao.Start(m.store.db); err != nil {
 		return nil
 	}
-	m.ing = true
 	return nil
 }
 
 func (m *message) Done() error {
-	m.ing = false
 	return m.dao.Done(m.store.db)
 }
 
@@ -158,9 +155,6 @@ func (m *message) Topic() string {
 }
 
 func (m *message) Payload() (interface{}, error) {
-	if !m.ing {
-		return nil, ErrMessageNotStart
-	}
 	return m.store.payloader.Decode(m.Topic(), m.dao.Payload)
 }
 
