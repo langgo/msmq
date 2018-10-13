@@ -88,7 +88,7 @@ func (mq *MessageQueue) Consume(ctx context.Context, topic string) <-chan Messag
 			for {
 				select {
 				case <-ctx.Done():
-					mq.logf("ctx Done")
+					mq.logf("topic:%s consumer canceled", topic)
 					return
 				default:
 				}
