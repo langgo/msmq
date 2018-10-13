@@ -86,6 +86,13 @@ func (mq *MessageQueue) Consume(ctx context.Context, topic string) <-chan Messag
 			}
 
 			for {
+				select {
+				case <-ctx.Done():
+					mq.logf("ctx Done")
+					return
+				default:
+				}
+
 				ok := rows.Next()
 				if !ok {
 					if err := rows.Close(); err != nil {
@@ -99,14 +106,9 @@ func (mq *MessageQueue) Consume(ctx context.Context, topic string) <-chan Messag
 					mq.logf("rows scan err:", err)
 					return
 				}
+				ch <- m
 
 				id = m.ID()
-				select {
-				case ch <- m:
-				case <-ctx.Done():
-					mq.logf("ctx Done")
-					return
-				}
 			}
 
 			time.Sleep(300 * time.Millisecond) // TODO 惰性检查间隔
