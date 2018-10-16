@@ -57,9 +57,9 @@ func NewMessageQueue(opts *Options, logger Logger, store Store) *MessageQueue {
 }
 
 // allow Concurrency
-func (mq *MessageQueue) Consume(ctx context.Context, topic string) <-chan Message {
+func (mq *MessageQueue) Consume(ctx context.Context, topic string) (<-chan Message, <-chan struct{}) {
 	ch := make(chan Message, mq.opts.QueueCacheLength)
-
+	done := make(chan struct{})
 	go func() {
 		var (
 			rows Rows
@@ -68,14 +68,15 @@ func (mq *MessageQueue) Consume(ctx context.Context, topic string) <-chan Messag
 		)
 
 		defer func() {
-			close(ch)
-
 			if rows != nil {
 				if err := rows.Close(); err != nil {
 					mq.logf("rows Close err:", err)
 					return
 				}
 			}
+
+			close(ch)
+			done <- struct{}{}
 		}()
 
 		for {
@@ -115,7 +116,7 @@ func (mq *MessageQueue) Consume(ctx context.Context, topic string) <-chan Messag
 		}
 	}()
 
-	return ch
+	return ch, done
 }
 
 // allow Concurrency

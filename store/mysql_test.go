@@ -44,7 +44,7 @@ func Test1(t *testing.T) {
 	}
 
 	go func() {
-		ch := mq.Consume(context.Background(), "test")
+		ch, _ := mq.Consume(context.Background(), "test")
 
 		for msg := range ch {
 			if err := msg.Start(); err != nil {
@@ -116,7 +116,7 @@ func TestBenchmarkConsume1(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	ch := mq.Consume(ctx, "test")
+	ch, done := mq.Consume(ctx, "test")
 	var wg sync.WaitGroup
 
 	wg.Add(1)
@@ -149,6 +149,7 @@ func TestBenchmarkConsume1(t *testing.T) {
 
 	}
 	cancel()
+	<-done
 	wg.Wait()
 
 	fmt.Println(count, delta)
