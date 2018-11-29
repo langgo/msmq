@@ -21,9 +21,9 @@ import (
 func GetMQ() (*msmq.MessageQueue, error) {
 	mopts := OptionsWithDB{
 		Debug:     false,
-		User:      "cloud",
-		Password:  "212147a1c567bb9e",
-		Address:   "mysql.yun3.com:3306",
+		User:      "",
+		Password:  "",
+		Address:   "",
 		DBName:    "msmq",
 		TableName: "mq",
 	}
