@@ -45,6 +45,16 @@ type mysqlStore struct {
 }
 
 type Options struct {
+	// 假设任务最长执行时间为 a
+	// 假设宕机最长时间为 b
+	// 下面时间为 c
+	// 应当满足 b < c < a
+	ReadRepeatTimeout time.Duration
+}
+
+type OptionsWithDB struct {
+	Options
+
 	Debug bool
 
 	User        string
@@ -54,15 +64,9 @@ type Options struct {
 	TableName   string
 	Timeout     string
 	ReadTimeout string
-
-	// 假设任务最长执行时间为 a
-	// 假设宕机最长时间为 b
-	// 下面时间为 c
-	// 应当满足 b < c < a
-	ReadRepeatTimeout time.Duration
 }
 
-func NewMysqlStore(opts *Options, payloader Payloader) (*mysqlStore, error) {
+func NewMysqlStore(opts *OptionsWithDB, payloader Payloader) (*mysqlStore, error) {
 	if opts.Timeout == "" {
 		opts.Timeout = "60s"
 	}
@@ -87,6 +91,14 @@ func NewMysqlStore(opts *Options, payloader Payloader) (*mysqlStore, error) {
 	}
 
 	db = db.Table(opts.TableName)
+	return &mysqlStore{
+		opts:      &opts.Options,
+		db:        db,
+		payloader: payloader,
+	}, nil
+}
+
+func NewMysqlStoreWithDB(opts *Options, db *gorm.DB, payloader Payloader) (*mysqlStore, error) {
 	return &mysqlStore{
 		opts:      opts,
 		db:        db,

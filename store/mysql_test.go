@@ -19,11 +19,11 @@ import (
 )
 
 func GetMQ() (*msmq.MessageQueue, error) {
-	mopts := Options{
+	mopts := OptionsWithDB{
 		Debug:     false,
-		User:      "",
-		Password:  "",
-		Address:   "",
+		User:      "cloud",
+		Password:  "212147a1c567bb9e",
+		Address:   "mysql.yun3.com:3306",
 		DBName:    "msmq",
 		TableName: "mq",
 	}
@@ -44,7 +44,7 @@ func Test1(t *testing.T) {
 	}
 
 	go func() {
-		ch, _ := mq.Consume(context.Background(), "test")
+		ch := mq.Consume(context.Background(), "test")
 
 		for msg := range ch {
 			if err := msg.Start(); err != nil {
@@ -116,7 +116,7 @@ func TestBenchmarkConsume1(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	ch, done := mq.Consume(ctx, "test")
+	ch := mq.Consume(ctx, "test")
 	var wg sync.WaitGroup
 
 	wg.Add(1)
@@ -149,7 +149,6 @@ func TestBenchmarkConsume1(t *testing.T) {
 
 	}
 	cancel()
-	<-done
 	wg.Wait()
 
 	fmt.Println(count, delta)
