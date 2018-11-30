@@ -44,6 +44,7 @@ type mysqlStore struct {
 }
 
 type Options struct {
+	TableName string
 	// 假设任务最长执行时间为 a
 	// 假设宕机最长时间为 b
 	// 下面时间为 c
@@ -56,11 +57,11 @@ type OptionsWithDB struct {
 
 	Debug bool
 
-	User        string
-	Password    string
-	Address     string
-	DBName      string
-	TableName   string
+	User     string
+	Password string
+	Address  string
+	DBName   string
+
 	Timeout     string
 	ReadTimeout string
 }
@@ -98,6 +99,7 @@ func NewMysqlStore(opts *OptionsWithDB, payloader Payloader) (*mysqlStore, error
 }
 
 func NewMysqlStoreWithDB(opts *Options, db *gorm.DB, payloader Payloader) (*mysqlStore, error) {
+	db = db.Table(opts.TableName)
 	return &mysqlStore{
 		opts:      opts,
 		db:        db,
