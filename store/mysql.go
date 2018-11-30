@@ -11,10 +11,9 @@ import (
 )
 
 var (
-	ErrMessageIng      = errors.New("the message is consuming")
-	ErrMessageDone     = errors.New("the message is consumed")
-	ErrAssertFail      = errors.New("assert failure")
-	ErrMessageNotStart = errors.New("message not start")
+	ErrMessageIng  = errors.New("the message is consuming")
+	ErrMessageDone = errors.New("the message is consumed")
+	ErrAssertFail  = errors.New("assert failure")
 )
 
 type Payloader interface {
@@ -138,6 +137,7 @@ func (ms *mysqlStore) Insert(topic string, payload interface{}) error {
 	return ms.db.Create(&dao).Error
 }
 
+// Close corresponding NewMysqlStore
 func (ms *mysqlStore) Close() error {
 	return ms.db.Close()
 }
@@ -152,10 +152,7 @@ func (m *message) ID() int {
 }
 
 func (m *message) Start() error {
-	if err := m.dao.Start(m.store.db); err != nil {
-		return nil
-	}
-	return nil
+	return m.dao.Start(m.store.db)
 }
 
 func (m *message) Done() error {
