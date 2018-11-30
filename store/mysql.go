@@ -99,6 +99,10 @@ func NewMysqlStore(opts *OptionsWithDB, payloader Payloader) (*mysqlStore, error
 }
 
 func NewMysqlStoreWithDB(opts *Options, db *gorm.DB, payloader Payloader) (*mysqlStore, error) {
+	if opts.ReadRepeatTimeout == 0 {
+		opts.ReadRepeatTimeout = 10 * time.Minute
+	}
+
 	db = db.Table(opts.TableName)
 	return &mysqlStore{
 		opts:      opts,
