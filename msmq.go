@@ -110,7 +110,7 @@ func (mq *MessageQueue) Consume(ctx context.Context, topic string) <-chan Messag
 				id = m.ID()
 			}
 
-			time.Sleep(300 * time.Millisecond) // TODO 惰性检查间隔
+			time.Sleep(mq.opts.StoreCheckInternal)
 		}
 	}()
 
