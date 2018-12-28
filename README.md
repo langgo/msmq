@@ -53,7 +53,5 @@ if err := mq.Produce("test", []byte("test data")); err != nil {
 - 有客户端保留消费偏移量，方便重放。
 - 支持Pub/Sub
 - 考虑批量插入，批量更新，提高并发时的效率
-- `func (mq *MessageQueue) Consume(ctx context.Context, topic string) <-chan Message {` 该函数中的 id 可以去掉
-
-    DBName:    "msmq",中
-    DBName:    "msmq",
+- `func (mq *MessageQueue) Consume(ctx context.Context, topic string) <-chan Message {` 该函数中的 id 可以去掉 
+- `type Message interface {` 中id可以去掉
